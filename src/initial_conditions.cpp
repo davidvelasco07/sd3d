@@ -13,23 +13,47 @@ void Initial_Conditions(){
     double s,value;
     for(int var=0; var<nvar; var++){
         for(int k=0; k<cv_z; k++){
+            #ifdef Z
+            dz=Z_faces[k+1]-Z_faces[k];
+            #endif
             for(int j=0; j<cv_y; j++){
+                #ifdef Y
                 dy=Y_faces[j+1]-Y_faces[j];
+                #endif
                 for(int i=0; i<cv_x; i++){
+                    #ifdef X
                     dx=X_faces[i+1]-X_faces[i];
+                    #endif
                     value=0.0;
-                    for( int m=0; m<ny_cv; m++){
-                        y = Y_faces[j] + x_t[m]*dy;
-                        for( int l=0; l<nx_cv; l++){
-                            x = X_faces[i] + x_t[l]*dx;
-                            //s=square_signal(var,x,y,z);
-                            //s=sine_wave(var,x,y,z);
-                            //s=kh_instability(var,x,y,z);
-                            //s=sod_3D(var,x,y,z);
-                            s=spherical_blast(var,x,y,z);
-                            s*=w_t[m];
-                            s*=w_t[l];
-                            value+=s;
+                    for( int n=0; n<nz_cv; n++){
+                        #ifdef Z
+                        z = Z_faces[k] + x_t[n]*dz;
+                        #endif
+                        for( int m=0; m<ny_cv; m++){
+                            #ifdef Y
+                            y = Y_faces[j] + x_t[m]*dy;
+                            #endif
+                            for( int l=0; l<nx_cv; l++){
+                                #ifdef X
+                                x = X_faces[i] + x_t[l]*dx;
+                                #endif
+                                //s=square_signal(var,x,y,z);
+                                //s=sine_wave(var,x,y,z);
+                                //s=kh_instability(var,x,y,z);
+                                s=sod_3D(var,x,y,z);
+                                //s=spherical_blast(var,x,y,z);
+                                //s=sedov_blast(var,x,y,z);
+                                #ifdef X
+                                s*=w_t[l];
+                                #endif
+                                #ifdef Y
+                                s*=w_t[m];
+                                #endif
+                                #ifdef Z
+                                s*=w_t[n];
+                                #endif
+                                value+=s;
+                            }
                         }
                     }
                     W_cv[i + j*cv_x + k*cv_x*cv_y + var*size_cv] = value;
@@ -45,7 +69,11 @@ double square_signal(int var, double x, double y, double z){
     rho_min=1;
     rho_max=2;
     if(var==0){
-        if( abs(x-0.5)<0.25 && abs(y-0.5)<0.25)
+        #ifdef _3D_
+        if( abs(x-0.5)<0.25 && abs(y-0.5)<0.25 && abs(z-0.5)<0.25 )
+        #else
+        if( abs(x-0.5)<0.25 && abs(y-0.5)<0.25 )
+        #endif
             return 2;
         else
             return 1;
@@ -146,10 +174,13 @@ double sod_3D(int var, double x, double y, double z){
 double spherical_blast(int var, double x, double y, double z){
     gmma=5./3.;
     double r,R=0.1;
+    double xc=boxlen_x/2;
+    double yc=boxlen_y/2;
+    double zc=boxlen_z/2;
     #ifndef _3D_
-    r=sqrt(pow(x-0.5,2) + pow(y-0.5,2));
+    r=sqrt(pow(x-xc,2) + pow(y-yc,2));
     #else
-    r=sqrt(pow(x-0.5,2) + pow(y-0.75,2) + pow(z-0.5,2));
+    r=sqrt(pow(x-xc,2) + pow(y-yc,2) + pow(z-zc,2));
     #endif
     if(var==0){
         return 1;

@@ -187,13 +187,14 @@ void riemann_solver_y(){
 void riemann_solver_z(){
     //Store fluxes at the interface between elements to then solve the unique flux
     int cell,face;
+    int fp_z=n_fp*cells_z;
     for(int var=0;var<nvar;var++){
         for(int i_ader = 0; i_ader<n_cv; i_ader++){
             for(int k=0;k<cells_z-1;k++){
                 for(int j=0;j<cv_y;j++){
                     for(int i=0;i<cv_x;i++){
-                        cell = i + j*cv_x + (k*n_fp)*cv_x*cv_y + i_ader*cv_x*cv_y*(n_fp*cells_z) + var*cv_x*cv_y*(n_fp*cells_z)*n_cv;
-                        face = i + j*cv_x + k*cv_x*cv_y        + i_ader*cv_x*cv_y*(cells_z-1)    + var*cv_x*cv_y*(cells_z-1)*n_cv;
+                        cell = i + j*cv_x + (k*n_fp)*cv_x*cv_y + i_ader*cv_x*cv_y*fp_z        + var*cv_x*cv_y*fp_z*n_cv;
+                        face = i + j*cv_x +  k*cv_x*cv_y       + i_ader*cv_x*cv_y*(cells_z-1) + var*cv_x*cv_y*(cells_z-1)*n_cv;
                         U_R[face] = U_ader_fp_z[cell+n_fp*(cv_x*cv_y)];
                         U_L[face] = U_ader_fp_z[cell+n_cv*(cv_x*cv_y)];
                     }
@@ -202,17 +203,16 @@ void riemann_solver_z(){
         }
     }
     //This should be a pointer towards whatever riemann solver was defined
-    riemann_llf(F_z,U_L,U_R,cv_x*cv_y*(cells_z-1)*n_cv,_vz_,_vx_,_vy_);
+    riemann_llf(F_z,U_L,U_R,cv_x*cv_y*(cells_z-1)*n_cv,_vz_,_vy_,_vx_);
     //After solving the Riemann problem at each interface we overwrite the values at F_ader... by U_R containing the results
     //of the Riemann solver
-    
     for(int var=0;var<nvar;var++){
         for(int i_ader = 0; i_ader<n_cv; i_ader++){
             for(int k=0;k<cells_z-1;k++){
                 for(int j=0;j<cv_y;j++){
                     for(int i=0;i<cv_x;i++){
-                        cell = i + j*cv_x + (k*n_fp)*cv_x*cv_y + i_ader*cv_x*cv_y*(n_fp*cells_z) + var*cv_x*cv_y*(n_fp*cells_z)*n_cv;
-                        face = i + j*cv_x + k*cv_x*cv_y        + i_ader*cv_x*cv_y*(cells_z-1)    + var*cv_x*cv_y*(cells_z-1)*n_cv;
+                        cell = i + j*cv_x + (k*n_fp)*cv_x*cv_y + i_ader*cv_x*cv_y*fp_z        + var*cv_x*cv_y*fp_z*n_cv;
+                        face = i + j*cv_x +  k*cv_x*cv_y       + i_ader*cv_x*cv_y*(cells_z-1) + var*cv_x*cv_y*(cells_z-1)*n_cv;
                         F_ader_fp_z[cell+n_fp*(cv_x*cv_y)] = F_z[face];
                         F_ader_fp_z[cell+n_cv*(cv_x*cv_y)] = F_z[face];
                     }

@@ -10,19 +10,30 @@ double min3(double a, double b, double c){
 void extrema(double *U_new, double *U, double *extrema, int var, double tolerance){
     int cv;
     double maximum, minimum;
-    int i=0,j=0,k=0;
+    int nm=0,np=0,mm=0,mp=0,lm=0,lp=0;
     #ifdef Z
+    nm=-1;np=1;
     for(int k=1;k<cv_z-1;k++){
     #endif
         #ifdef Y
-        for(int j=1;j<cv_y-1;j++){
+        mm=-1;mp=1;
+        for(int j=1;j<cv_y-1;j++){  
         #endif
             #ifdef X
-            for(int i=1;i<cv_x-1;i++){
+            lm=-1;lp=1;
+            for(int i=1;i<cv_x-1;i++){  
             #endif
                 cv = i + j*cv_x + k*cv_x*cv_y + var*cv_x*cv_y*cv_z;
                 maximum = U[cv];
                 minimum = U[cv];
+                //for(int n=nm;n<=np;n++){
+                //    for(int m=mm;m<=mp;m++){
+                //        for(int l=lm;l<=lp;l++){
+                //            maximum = max(maximum,U[cv +l + m*cv_x + n*cv_x*cv_y]);
+                //            minimum = min(minimum,U[cv +l + m*cv_x + n*cv_x*cv_y]);
+                //        }
+                //    }
+                //}
                 #ifdef X
                 maximum = max3(U[cv-1],maximum,U[cv+1]);
                 minimum = min3(U[cv-1],minimum,U[cv+1]);
@@ -201,7 +212,7 @@ void PAD_criteria(double *W, double *troubles, int var, double vmin, double vmax
 void detect_field_troubles(int var){
     memset(possible_troubles, 0, size_cv*sizeof(double));
     //First we check the DMP criteria
-    extrema(W_new, W_cv, possible_troubles, var, 1E-12);
+    extrema(W_new, W_cv, possible_troubles, var, 1E-14);
     //Then relax the DMP criteria for smooth extrema
     #ifdef X
     smooth_extrema_x(W_new,dUdx,var);

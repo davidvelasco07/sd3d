@@ -32,18 +32,14 @@ void Build_mesh(){
     #ifdef X
     X_faces = malloc_host<double>(cv_faces_x);
     X_centers = malloc_host<double>(cv_x);
-    X_sp = malloc_host<double>(cv_x);
     build_faces(X_faces, x_fp, cells_x, n, x_i, boxlen_x/cpu_x, dx);
     build_centers(X_centers, X_faces, cv_x);
-    build_sp(X_sp, x_sp, cells_x, n, x_i, boxlen_x/cpu_x, dx);
     #endif
     #ifdef Y
     Y_faces = malloc_host<double>(cv_faces_y);
     Y_centers = malloc_host<double>(cv_y);
-    Y_sp = malloc_host<double>(cv_y);
     build_faces(Y_faces, x_fp, cells_y, n, y_i, boxlen_y/cpu_y, dy);
     build_centers(Y_centers, Y_faces, cv_y);
-    build_sp(Y_sp, x_sp, cells_y, n, y_i, boxlen_y/cpu_y, dy);
     #endif
     #ifdef Z
     Z_faces = malloc_host<double>(cv_faces_z);
@@ -77,7 +73,7 @@ void Build_mesh(){
     W_ader_fp_z = malloc_host<double>(cv_x*cv_y*n_fp*cells_z*n_cv*nvar);
     F_ader_fp_z = malloc_host<double>(cv_x*cv_y*n_fp*cells_z*n_cv*nvar);
     #endif
-    int flux_size = max(max((cv_faces_x)*cv_y*cv_z,cv_x*(cv_faces_y)*cv_z),cv_x*cv_y*(cv_faces_z));
+    int flux_size = max(max((cv_faces_x-1)*cv_y*cv_z,cv_x*(cv_faces_y-1)*cv_z),cv_x*cv_y*(cv_faces_z-1));
     U_L = malloc_host<double>(flux_size*nvar); 
     U_R = malloc_host<double>(flux_size*nvar);
     #ifdef X
