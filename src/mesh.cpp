@@ -1,20 +1,12 @@
 #include "sd3d.hpp"
 
-void build_faces(double *faces, double *x_fp, int N, int n, int x_i, double boxlen, double dx){
-    for(int j=0;j<N;j++){
-        for(int i=0;i<n+1;i++){
-            faces[i+j*(n+1)]= ((j-NGH + x_i) + x_fp[i])*dx;
-        }
-    }
-    faces[N*(n+1)] = boxlen+(NGH*dx);
-}
-
-void build_sp(double *sp, double *x_sp, int N, int n, int x_i, double boxlen, double dx){
+void build_faces(double *faces, double *x_fp, int N, int x_i, double dx){
     for(int j=0;j<N;j++){
         for(int i=0;i<n_cv;i++){
-            sp[i+j*n_cv]= ((j-NGH + x_i) + x_sp[i])*dx;
+            faces[i+j*n_cv]= ((j-NGH + x_i) + x_fp[i])*dx;
         }
     }
+    faces[N*n_cv] = (N-NGH + x_i)*dx;
 }
 
 void build_centers(double *centers, double *faces, int N){
@@ -32,19 +24,19 @@ void Build_mesh(){
     #ifdef X
     X_faces = malloc_host<double>(cv_faces_x);
     X_centers = malloc_host<double>(cv_x);
-    build_faces(X_faces, x_fp, cells_x, n, x_i, boxlen_x/cpu_x, dx);
+    build_faces(X_faces, x_fp, cells_x, x_i, dx);
     build_centers(X_centers, X_faces, cv_x);
     #endif
     #ifdef Y
     Y_faces = malloc_host<double>(cv_faces_y);
     Y_centers = malloc_host<double>(cv_y);
-    build_faces(Y_faces, x_fp, cells_y, n, y_i, boxlen_y/cpu_y, dy);
+    build_faces(Y_faces, x_fp, cells_y, y_i, dy);
     build_centers(Y_centers, Y_faces, cv_y);
     #endif
     #ifdef Z
     Z_faces = malloc_host<double>(cv_faces_z);
     Z_centers = malloc_host<double>(cv_z);
-    build_faces(Z_faces, x_fp, cells_z, n, z_i, boxlen_z/cpu_z, dz);
+    build_faces(Z_faces, x_fp, cells_z, z_i, dz);
     build_centers(Z_centers, Z_faces, cv_z);
     #endif
 

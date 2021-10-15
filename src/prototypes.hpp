@@ -11,7 +11,7 @@ extern void integral_matrix(double*, double*, double*, double*, double*, int);
 extern void inverse(double*, double*, int);
 
 extern void Build_mesh();
-extern void build_faces(double*, double*, int, int, double, double);
+extern void build_faces(double*, double*, int, double);
 extern void build_centers(double*, double*, int);
 
 
