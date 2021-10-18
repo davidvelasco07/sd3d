@@ -115,7 +115,7 @@ int main(int argc, char** argv){
             riemann_solver_z();
             derive_fp_z_to_sp(F_ader_fp_z, dU_ader_sp);
             #endif
-            Boundary_Conditions(U_ader_sp,n_cv);  
+            Boundary_Conditions(dU_ader_sp,n_cv);  
             if(i<n)
                 ader_subupdate(U_ader_sp,U_sp,dU_ader_sp);
                     
