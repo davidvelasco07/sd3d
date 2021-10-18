@@ -44,14 +44,14 @@ extern void fv_update(double *, double *, int);
 
 extern void Initial_Conditions( );
 extern void Split_Domain( );
-extern void Boundary_Conditions(double*);
+extern void Boundary_Conditions(double*, int);
 extern void Store_boundaries(double*);
-extern void store_boundaries_x(double*);
-extern void store_boundaries_y(double*);
-extern void store_boundaries_z(double*);
-extern void apply_boundaries_x(double*);
-extern void apply_boundaries_y(double*);
-extern void apply_boundaries_z(double*);
+extern void store_boundaries_x(double*, int);
+extern void store_boundaries_y(double*, int);
+extern void store_boundaries_z(double*, int);
+extern void apply_boundaries_x(double*, int);
+extern void apply_boundaries_y(double*, int);
+extern void apply_boundaries_z(double*, int);
 
 //Time step
 extern void compute_dt();
@@ -64,10 +64,10 @@ extern void Write_edges();
 
 //Comms
 extern void Build_comms();
-extern void Exec_comms(double*);
-extern void fill_comms_x(double*, double*, int);
-extern void fill_comms_y(double*, double*, int);
-extern void fill_comms_z(double*, double*, int);
+extern void Exec_comms(double*, int);
+extern void fill_comms_x(double*, double*, int, int);
+extern void fill_comms_y(double*, double*, int, int);
+extern void fill_comms_z(double*, double*, int, int);
 
 extern void detect_troubles();
 extern void godunov_2O();

@@ -80,18 +80,18 @@ void Build_mesh(){
 
     #ifdef X
     BC_x_size = NGH*n_cv*cv_y*cv_z*nvar;
-    BC_x[0] = malloc_host<double>(BC_x_size); 
-    BC_x[1] = malloc_host<double>(BC_x_size); 
+    BC_x[0] = malloc_host<double>(BC_x_size*n_cv); 
+    BC_x[1] = malloc_host<double>(BC_x_size*n_cv); 
     #endif
     #ifdef Y
     BC_y_size = cv_x*NGH*n_cv*cv_z*nvar;
-    BC_y[0] = malloc_host<double>(BC_y_size);
-    BC_y[1] = malloc_host<double>(BC_y_size);
+    BC_y[0] = malloc_host<double>(BC_y_size*n_cv);
+    BC_y[1] = malloc_host<double>(BC_y_size*n_cv);
     #endif
     #ifdef Z
     BC_z_size = cv_x*cv_y*NGH*n_cv*nvar;
-    BC_z[0] = malloc_host<double>(BC_z_size);
-    BC_z[1] = malloc_host<double>(BC_z_size);
+    BC_z[0] = malloc_host<double>(BC_z_size*n_cv);
+    BC_z[1] = malloc_host<double>(BC_z_size*n_cv);
     #endif
 
     #ifndef SD

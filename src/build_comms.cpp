@@ -38,9 +38,9 @@ void Build_comms(){
         cpu_boundary[_x_][0] = (cpu_neighbour[_x_][0] == cpu_rank ? 0: 1);
         cpu_boundary[_x_][1] = (cpu_neighbour[_x_][1] == cpu_rank ? 0: 1);
         if(cpu_boundary[_x_][0])
-            N_comms+=comms[_x_][0].build(cpu_rank,cpu_neighbour[_x_][0],BC_x_size);
+            N_comms+=comms[_x_][0].build(cpu_rank,cpu_neighbour[_x_][0],BC_x_size*n_cv);
         if(cpu_boundary[_x_][1])
-            N_comms+=comms[_x_][1].build(cpu_rank,cpu_neighbour[_x_][1],BC_x_size);
+            N_comms+=comms[_x_][1].build(cpu_rank,cpu_neighbour[_x_][1],BC_x_size*n_cv);
 #endif
 #ifdef Y
         if(rank_y > 0)
@@ -54,9 +54,9 @@ void Build_comms(){
         cpu_boundary[_y_][0] = (cpu_neighbour[_y_][0] == cpu_rank ? 0: 1);
         cpu_boundary[_y_][1] = (cpu_neighbour[_y_][1] == cpu_rank ? 0: 1);
         if(cpu_boundary[_y_][0])
-            N_comms+=comms[_y_][0].build(cpu_rank,cpu_neighbour[_y_][0],BC_y_size);
+            N_comms+=comms[_y_][0].build(cpu_rank,cpu_neighbour[_y_][0],BC_y_size*n_cv);
         if(cpu_boundary[_y_][1])
-            N_comms+=comms[_y_][1].build(cpu_rank,cpu_neighbour[_y_][1],BC_y_size);
+            N_comms+=comms[_y_][1].build(cpu_rank,cpu_neighbour[_y_][1],BC_y_size*n_cv);
 #endif
 #ifdef Z
         if(rank_z > 0)
@@ -70,9 +70,9 @@ void Build_comms(){
         cpu_boundary[_z_][0] = (cpu_neighbour[_z_][0] == cpu_rank ? 0: 1);
         cpu_boundary[_z_][1] = (cpu_neighbour[_z_][1] == cpu_rank ? 0: 1);
         if(cpu_boundary[_z_][0])
-            N_comms+=comms[_z_][0].build(cpu_rank,cpu_neighbour[_z_][0],BC_z_size);
+            N_comms+=comms[_z_][0].build(cpu_rank,cpu_neighbour[_z_][0],BC_z_size*n_cv);
         if(cpu_boundary[_z_][1])
-            N_comms+=comms[_z_][1].build(cpu_rank,cpu_neighbour[_z_][1],BC_z_size);
+            N_comms+=comms[_z_][1].build(cpu_rank,cpu_neighbour[_z_][1],BC_z_size*n_cv);
 #endif
         //cout<<cpu_rank<<" has "<<N_comms<<" comms"<<endl;
     }

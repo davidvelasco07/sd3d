@@ -34,4 +34,8 @@ void compute_dt(){
     #else
     dt=dt_min;
     #endif
+    if(dt<1E-10){
+        if(Master)cout<<"Stopped with dt="<<dt<<endl;
+        finish();
+    }
 }

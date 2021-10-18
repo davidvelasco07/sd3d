@@ -11,17 +11,18 @@ void extrema(double *U_new, double *U, double *extrema, int var, double toleranc
     int cv;
     double maximum, minimum;
     int nm=0,np=0,mm=0,mp=0,lm=0,lp=0;
+    int i=0,j=0,k=0;
     #ifdef Z
     nm=-1;np=1;
-    for(int k=1;k<cv_z-1;k++){
+    for(k=1;k<cv_z-1;k++){
     #endif
         #ifdef Y
         mm=-1;mp=1;
-        for(int j=1;j<cv_y-1;j++){  
+        for(j=1;j<cv_y-1;j++){  
         #endif
             #ifdef X
             lm=-1;lp=1;
-            for(int i=1;i<cv_x-1;i++){  
+            for(i=1;i<cv_x-1;i++){  
             #endif
                 cv = i + j*cv_x + k*cv_x*cv_y + var*cv_x*cv_y*cv_z;
                 maximum = U[cv];
@@ -228,7 +229,7 @@ void detect_field_troubles(int var){
 
 void detect_troubles(){
     memset(troubles, 0, size_cv*sizeof(double));
-    Boundary_Conditions(U_new);
+    Boundary_Conditions(U_new,1);
     cons_to_prim(U_new,W_new,size_cv);
     cons_to_prim(U_cv ,W_cv ,size_cv);
     detect_field_troubles(0);

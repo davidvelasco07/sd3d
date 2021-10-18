@@ -115,13 +115,14 @@ int main(int argc, char** argv){
             riemann_solver_z();
             derive_fp_z_to_sp(F_ader_fp_z, dU_ader_sp);
             #endif
+            Boundary_Conditions(U_ader_sp,n_cv);  
             if(i<n)
-                ader_subupdate(U_ader_sp,U_sp,dU_ader_sp);          
+                ader_subupdate(U_ader_sp,U_sp,dU_ader_sp);
+                    
         }
         #ifdef SD
         ader_update(U_sp,dU_ader_sp);
         #else
-        //ader_update(U_sp,dU_ader_sp);transform_sp_to_cv(U_sp,U_cv);Write(1);finish();
         //Change to Finite Volume scheme
         transform_sp_to_cv(U_sp,U_cv);
         for(i=0;i<n_cv;i++){
@@ -143,12 +144,12 @@ int main(int argc, char** argv){
             //fv_update(U_cv,U_cv,i);
             //fv_godunov2O_update(U_cv,U_cv,i);
             fv_corrected_update(U_cv,U_cv,i);
-            Boundary_Conditions(U_cv);//Write(n_output++);
+            Boundary_Conditions(U_cv,1);//Write(n_output++);
         }//Write(n_output++);finish();
         transform_cv_to_sp(U_cv,U_sp);
         #endif
         #ifdef SD
-        Boundary_Conditions(U_sp);
+        Boundary_Conditions(U_sp,1);
         #endif
 
         compute_dt();
