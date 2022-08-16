@@ -213,7 +213,7 @@ void PAD_criteria(double *W, double *troubles, int var, double vmin, double vmax
 void detect_field_troubles(int var){
     memset(possible_troubles, 0, size_cv*sizeof(double));
     //First we check the DMP criteria
-    extrema(W_new, W_cv, possible_troubles, var, 1E-14);
+    extrema(W_new, W_cv, possible_troubles, var, 1E-6);
     //Then relax the DMP criteria for smooth extrema
     #ifdef X
     smooth_extrema_x(W_new,dUdx,var);
@@ -229,9 +229,6 @@ void detect_field_troubles(int var){
 
 void detect_troubles(){
     memset(troubles, 0, size_cv*sizeof(double));
-    Boundary_Conditions(U_new,1);
-    cons_to_prim(U_new,W_new,size_cv);
-    cons_to_prim(U_cv ,W_cv ,size_cv);
     detect_field_troubles(0);
     #ifndef ADVECTION
     detect_field_troubles(_p_);

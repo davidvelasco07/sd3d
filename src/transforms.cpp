@@ -78,22 +78,23 @@ void transform_sp_to_cv(double *U_sp, double *U_cv){
     }
 }
 
-void transform_sp_to_fp_x(double *U_sp, double *U_fp_x, int n_ader){
-    int cell,face,fp_x=n_fp*cells_x;
+void transform_sp_to_fp_x(double *U_sp, double *U_fp_x, int n_a){
+    int cell,face,fp_x=n_fp*cells_x,fp;
     //Get values at solution points from control volume averages
     for(int var=0; var<nvar; var++){
-        for(int i_ader = 0; i_ader<n_ader; i_ader++){
+        for(int i_a = 0; i_a<n_a; i_a++){
             for(int kk=0;kk<cells_z;kk++){
                 for(int jj=0;jj<cells_y;jj++){
                     for(int ii=0;ii<cells_x;ii++){
-                        cell = (ii*nx_cv) + (jj*ny_cv)*cv_x + (kk*nz_cv)*cv_x*cv_y + i_ader*size_cv        + var*size_cv*n_ader;
-                        face = (ii*nx_fp) + (jj*ny_cv)*fp_x + (kk*nz_cv)*fp_x*cv_y + i_ader*fp_x*cv_y*cv_z + var*fp_x*cv_y*cv_z*n_ader;
+                        cell = (ii*nx_cv) + (jj*ny_cv)*cv_x + (kk*nz_cv)*cv_x*cv_y + i_a*size_cv        + var*size_cv*n_a;
+                        face = (ii*nx_fp) + (jj*ny_cv)*fp_x + (kk*nz_cv)*fp_x*cv_y + i_a*fp_x*cv_y*cv_z + var*fp_x*cv_y*cv_z*n_a;
                         for(int k=0;k<nz_cv;k++){
                             for(int j=0;j<ny_cv;j++){
                                 for(int i=0;i<nx_fp;i++){
-                                    U_fp_x[i+j*fp_x+k*fp_x*cv_y+face]=0.0;
+                                    fp=i+j*fp_x+k*fp_x*cv_y+face;
+                                    U_fp_x[fp]=0.0;
                                     for(int l=0;l<n_cv;l++){
-                                        U_fp_x[i+j*fp_x+k*fp_x*cv_y+face] += U_sp[l+j*cv_x+k*cv_x*cv_y+cell]*sp_to_fp[l+i*n_cv];
+                                        U_fp_x[fp] += U_sp[l+j*cv_x+k*cv_x*cv_y+cell]*sp_to_fp[l+i*n_cv];
                                     }
                                 }
                             }
@@ -105,22 +106,23 @@ void transform_sp_to_fp_x(double *U_sp, double *U_fp_x, int n_ader){
     }
 }
 
-void transform_sp_to_fp_y(double *U_sp, double *U_fp_y, int n_ader){
-    int cell,face,fp_y=n_fp*cells_y;
+void transform_sp_to_fp_y(double *U_sp, double *U_fp_y, int n_a){
+    int cell,face,fp_y=n_fp*cells_y,fp;
     //Get values at solution points from control volume averages
     for(int var=0; var<nvar; var++){
-        for(int i_ader = 0; i_ader<n_ader; i_ader++){
+        for(int i_a = 0; i_a<n_a; i_a++){
             for(int kk=0;kk<cells_z;kk++){
                 for(int jj=0;jj<cells_y;jj++){
                     for(int ii=0;ii<cells_x;ii++){
-                        cell = (ii*nx_cv) + (jj*ny_cv)*cv_x + (kk*nz_cv)*cv_x*cv_y + i_ader*size_cv        + var*size_cv*n_ader;
-                        face = (ii*nx_cv) + (jj*ny_fp)*cv_x + (kk*nz_cv)*cv_x*fp_y + i_ader*cv_x*fp_y*cv_z + var*cv_x*fp_y*cv_z*n_ader;
+                        cell = (ii*nx_cv) + (jj*ny_cv)*cv_x + (kk*nz_cv)*cv_x*cv_y + i_a*size_cv        + var*size_cv*n_a;
+                        face = (ii*nx_cv) + (jj*ny_fp)*cv_x + (kk*nz_cv)*cv_x*fp_y + i_a*cv_x*fp_y*cv_z + var*cv_x*fp_y*cv_z*n_a;
                         for(int k=0;k<nz_cv;k++){
                             for(int j=0;j<ny_fp;j++){
                                 for(int i=0;i<nx_cv;i++){
-                                    U_fp_y[i+j*cv_x+k*cv_x*fp_y+face]=0.0;
+                                    fp=i+j*cv_x+k*cv_x*fp_y+face;
+                                    U_fp_y[fp]=0.0;
                                     for(int m=0;m<n_cv;m++){
-                                        U_fp_y[i+j*cv_x+k*cv_x*fp_y+face] += U_sp[i+m*cv_x+k*cv_x*cv_y+cell]*sp_to_fp[m+j*n_cv]; 
+                                        U_fp_y[fp] += U_sp[i+m*cv_x+k*cv_x*cv_y+cell]*sp_to_fp[m+j*n_cv]; 
                                     }
                                 }
                             }

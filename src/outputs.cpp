@@ -12,7 +12,9 @@ void Write_fields(int step){
 
 void Write_array(double *array, int size, char *name){
     ofstream output;
-    output.open(name);
+    char outname[100];
+    sprintf(outname,"/scratch/snx3000/dvelasco/sd3d/%s_%d.dat", name, cpu_rank);
+    output.open(outname);
     output.write((char*)array, size*sizeof(double));
     output.close();
 }

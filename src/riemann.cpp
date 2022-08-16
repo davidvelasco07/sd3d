@@ -26,7 +26,7 @@ void riemann_llf(double *F, double *U_L, double *U_R, int faces, int _v1_, int _
     }
 }
 
-void riemann_hllc(double *F, double *U_L, double *U_R, int faces, int _v1_, int _v2_, int _v3_){
+void riemann_hllc(double *F, double *U_L, double *U_R, int faces, int _v1_, int _v2_, int _v3_, bool conservatives){
     double *u_L = malloc_host<double>(nvar);
     double *u_R = malloc_host<double>(nvar);
     double *w_L = malloc_host<double>(nvar);
@@ -38,11 +38,23 @@ void riemann_hllc(double *F, double *U_L, double *U_R, int faces, int _v1_, int 
     double r_gdv,v_gdv,p_gdv,e_gdv;
     for(int i=0; i<faces; i++){
         for(int var=0; var<nvar; var++){
-            u_L[var] =  U_L[i+var*faces];
-            u_R[var] =  U_R[i+var*faces];
+            if(conservatives){
+                u_L[var] =  U_L[i+var*faces];
+                u_R[var] =  U_R[i+var*faces];
+            }
+            else{
+                w_L[var] =  U_L[i+var*faces];
+                w_R[var] =  U_R[i+var*faces];
+            }
         }
-        cons_to_prim(u_L, w_L, 1);
-        cons_to_prim(u_R, w_R, 1);  
+        if(conservatives){
+            cons_to_prim(u_L, w_L, 1);
+            cons_to_prim(u_R, w_R, 1);
+        }
+        else{
+            prim_to_cons(w_L, u_L, 1);
+            prim_to_cons(w_R, u_R, 1);
+        }
 
         c_L = sound_speed(w_L[0],w_L[_p_])+abs(w_L[_v1_]);
         c_R = sound_speed(w_R[0],w_R[_p_])+abs(w_R[_v1_]);
@@ -128,8 +140,7 @@ void riemann_solver_x(){
     }
     //This should be a pointer towards whatever riemann solver was defined
     riemann_llf(F_x,U_L,U_R,(cells_x-1)*cv_y*cv_z*n_cv,_vx_,_vy_,_vz_);
-    //After solving the Riemann problem at each interface we overwrite the values at F_ader... by U_R containing the results
-    //of the Riemann solver
+
     for(int var=0;var<nvar;var++){
         for(int i_ader = 0; i_ader<n_cv; i_ader++){
             for(int k=0;k<cv_z;k++){
@@ -166,8 +177,7 @@ void riemann_solver_y(){
     }
     //This should be a pointer towards whatever riemann solver was defined
     riemann_llf(F_y,U_L,U_R,cv_x*(cells_y-1)*cv_z*n_cv,_vy_,_vx_,_vz_);
-    //After solving the Riemann problem at each interface we overwrite the values at F_ader... by U_R containing the results
-    //of the Riemann solver
+
     for(int var=0;var<nvar;var++){
         for(int i_ader = 0; i_ader<n_cv; i_ader++){
             for(int k=0;k<cv_z;k++){
@@ -204,8 +214,7 @@ void riemann_solver_z(){
     }
     //This should be a pointer towards whatever riemann solver was defined
     riemann_llf(F_z,U_L,U_R,cv_x*cv_y*(cells_z-1)*n_cv,_vz_,_vy_,_vx_);
-    //After solving the Riemann problem at each interface we overwrite the values at F_ader... by U_R containing the results
-    //of the Riemann solver
+
     for(int var=0;var<nvar;var++){
         for(int i_ader = 0; i_ader<n_cv; i_ader++){
             for(int k=0;k<cells_z-1;k++){

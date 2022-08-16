@@ -1,27 +1,25 @@
 #include "sd3d.hpp"
 
 void Boundary_Conditions(double* U, int n_a){
-    //Boundaries
-    
-    #if defined(X) && defined(Periodic_X)
+    #ifdef X
+    #ifdef Periodic_X
     store_boundaries_x(U,n_a);
     #endif
-    #if defined(Y) && defined(Periodic_Y)
-    store_boundaries_y(U,n_a);
-    #endif
-    #if defined(Z) && defined(Periodic_Z)
-    store_boundaries_z(U,n_a);
-    #endif
-   
-    if(cpu_size>1)Exec_comms(U,n_a);
-        
-    #ifdef X
+    if(cpu_x>1)Exec_comms_x(U,n_a);
     apply_boundaries_x(U,n_a);
     #endif
     #ifdef Y
+    #ifdef Periodic_Y
+    store_boundaries_y(U,n_a);
+    #endif
+    if(cpu_y>1)Exec_comms_y(U,n_a);
     apply_boundaries_y(U,n_a);
     #endif
     #ifdef Z
+    #ifdef Periodic_Z
+    store_boundaries_z(U,n_a);
+    #endif
+    if(cpu_z>1)Exec_comms_z(U,n_a);
     apply_boundaries_z(U,n_a);
     #endif
 }
@@ -39,19 +37,19 @@ void Store_boundaries(double *U){
 }
 
 void store_boundaries_x(double *U, int n_a){
-    int cell;
+    int cv;
     for(int var=0; var<nvar; var++){
         for(int i_a=0; i_a<n_a; i_a++){
             for(int k=0;k<cv_z;k++){
                 for(int j=0;j<cv_y;j++){
                     for(int i=0;i<NGH*n_cv;i++){
-                        cell = i + j*NGH*n_cv + k*NGH*n_cv*cv_y + i_a*NGH*n_cv*cv_y*cv_z + var*NGH*n_cv*cv_y*cv_z*n_a;
+                        cv = i + j*NGH*n_cv + k*NGH*n_cv*cv_y + i_a*NGH*n_cv*cv_y*cv_z + var*NGH*n_cv*cv_y*cv_z*n_a;
                         #ifdef Periodic_X
-                        BC_x[0][cell] = U[i+Nx*n_cv  + j*cv_x + k*cv_x*cv_y + i_a*size_cv + var*size_cv*n_a]; 
-                        BC_x[1][cell] = U[i+NGH*n_cv + j*cv_x + k*cv_x*cv_y + i_a*size_cv + var*size_cv*n_a]; 
+                        BC_x[0][cv] = U[i+Nx*n_cv  + j*cv_x + k*cv_x*cv_y + i_a*size_cv + var*size_cv*n_a]; 
+                        BC_x[1][cv] = U[i+NGH*n_cv + j*cv_x + k*cv_x*cv_y + i_a*size_cv + var*size_cv*n_a]; 
                         #else
-                        BC_x[0][cell] = U[i               + j*cv_x + k*cv_x*cv_y + i_a*size_cv + var*size_cv*n_a]; 
-                        BC_x[1][cell] = U[i+(Nx+NGH)*n_cv + j*cv_x + k*cv_x*cv_y + i_a*size_cv + var*size_cv*n_a];
+                        BC_x[0][cv] = U[i               + j*cv_x + k*cv_x*cv_y + i_a*size_cv + var*size_cv*n_a]; 
+                        BC_x[1][cv] = U[i+(Nx+NGH)*n_cv + j*cv_x + k*cv_x*cv_y + i_a*size_cv + var*size_cv*n_a];
                         #endif
                     }
                 }
@@ -61,19 +59,19 @@ void store_boundaries_x(double *U, int n_a){
 }
 
 void store_boundaries_y(double *U,int n_a){
-    int cell;
+    int cv;
     for(int var=0; var<nvar; var++){
         for(int i_a=0; i_a<n_a; i_a++){
             for(int k=0;k<cv_z;k++){
                 for(int j=0;j<NGH*n_cv;j++){
                     for(int i=0;i<cv_x;i++){
-                        cell = i + j*cv_x + k*cv_x*NGH*n_cv + i_a*cv_x*NGH*n_cv*cv_z + var*cv_x*NGH*n_cv*cv_z*n_a;
+                        cv = i + j*cv_x + k*cv_x*NGH*n_cv + i_a*cv_x*NGH*n_cv*cv_z + var*cv_x*NGH*n_cv*cv_z*n_a;
                         #ifdef Periodic_Y
-                        BC_y[0][cell] = U[i + (j+Ny*n_cv)*cv_x  + k*cv_x*cv_y + i_a*size_cv + var*size_cv*n_a]; 
-                        BC_y[1][cell] = U[i + (j+NGH*n_cv)*cv_x + k*cv_x*cv_y + i_a*size_cv + var*size_cv*n_a]; 
+                        BC_y[0][cv] = U[i + (j+Ny*n_cv)*cv_x  + k*cv_x*cv_y + i_a*size_cv + var*size_cv*n_a]; 
+                        BC_y[1][cv] = U[i + (j+NGH*n_cv)*cv_x + k*cv_x*cv_y + i_a*size_cv + var*size_cv*n_a]; 
                         #else
-                        BC_y[0][cell] = U[i +  j*cv_x                + k*cv_x*cv_y + i_a*size_cv + var*size_cv*n_a]; 
-                        BC_y[1][cell] = U[i + (j+(NGH+Ny)*n_cv)*cv_x + k*cv_x*cv_y + i_a*size_cv + var*size_cv*n_a]; 
+                        BC_y[0][cv] = U[i +  j*cv_x                + k*cv_x*cv_y + i_a*size_cv + var*size_cv*n_a]; 
+                        BC_y[1][cv] = U[i + (j+(NGH+Ny)*n_cv)*cv_x + k*cv_x*cv_y + i_a*size_cv + var*size_cv*n_a]; 
                         #endif
                     }  
                 }
@@ -129,7 +127,7 @@ void apply_boundaries_y(double *U, int n_a){
                 for(int j=0;j<NGH*n_cv;j++){
                     for(int i=0;i<cv_x;i++){
                         cv = i + j*cv_x + k*cv_x*NGH*n_cv + i_a*cv_x*NGH*n_cv*cv_z + var*cv_x*NGH*n_cv*cv_z*n_a;
-                        U[i + j*cv_x                 + k*cv_x*cv_y + i_a*size_cv + var*size_cv*n_a] = BC_y[0][cv];
+                        U[i +  j*cv_x                + k*cv_x*cv_y + i_a*size_cv + var*size_cv*n_a] = BC_y[0][cv];
                         U[i + (j+(Ny+NGH)*n_cv)*cv_x + k*cv_x*cv_y + i_a*size_cv + var*size_cv*n_a] = BC_y[1][cv];
                     }
                 }

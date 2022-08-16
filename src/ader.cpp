@@ -15,12 +15,12 @@ void ader_subupdate(double *U_ader_sp, double *U_sp, double *dU_ader_sp){
     }
 }
 
-void ader_update(double *U_sp, double *dU_sp){
+void ader_update(double *U_sp, double *dU_ader_sp){
     int cell;
     for(int var=0; var<nvar; var++){
         for(int i_ader = 0; i_ader<n_cv; i_ader++){
             for(int i=0;i<size_cv;i++){
-                U_sp[i+var*size_cv] -= dU_sp[i + i_ader*size_cv + var*size_cv*n_cv]*w_t[i_ader]*dt;
+                U_sp[i+var*size_cv] -= dU_ader_sp[i + i_ader*size_cv + var*size_cv*n_cv]*w_t[i_ader]*dt;
             }
         }
     }

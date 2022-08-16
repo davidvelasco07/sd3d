@@ -79,37 +79,47 @@ void Build_mesh(){
     #endif
 
     #ifdef X
+    BC_ader_x_size = NGH*n_cv*cv_y*cv_z*nvar*n_cv;
+    BC_ader_x[0] = malloc_host<double>(BC_ader_x_size); 
+    BC_ader_x[1] = malloc_host<double>(BC_ader_x_size);
     BC_x_size = NGH*n_cv*cv_y*cv_z*nvar;
-    BC_x[0] = malloc_host<double>(BC_x_size*n_cv); 
-    BC_x[1] = malloc_host<double>(BC_x_size*n_cv); 
+    BC_x[0] = malloc_host<double>(BC_x_size); 
+    BC_x[1] = malloc_host<double>(BC_x_size); 
     #endif
     #ifdef Y
+    BC_ader_y_size = cv_x*NGH*n_cv*cv_z*nvar*n_cv;
+    BC_ader_y[0] = malloc_host<double>(BC_ader_y_size); 
+    BC_ader_y[1] = malloc_host<double>(BC_ader_y_size);
     BC_y_size = cv_x*NGH*n_cv*cv_z*nvar;
-    BC_y[0] = malloc_host<double>(BC_y_size*n_cv);
-    BC_y[1] = malloc_host<double>(BC_y_size*n_cv);
+    BC_y[0] = malloc_host<double>(BC_y_size);
+    BC_y[1] = malloc_host<double>(BC_y_size);
     #endif
     #ifdef Z
+    BC_ader_z_size = cv_x*cv_y*NGH*n_cv*nvar*n_cv;
+    BC_ader_z[0] = malloc_host<double>(BC_ader_z_size); 
+    BC_ader_z[1] = malloc_host<double>(BC_ader_z_size);
     BC_z_size = cv_x*cv_y*NGH*n_cv*nvar;
-    BC_z[0] = malloc_host<double>(BC_z_size*n_cv);
-    BC_z[1] = malloc_host<double>(BC_z_size*n_cv);
+    BC_z[0] = malloc_host<double>(BC_z_size);
+    BC_z[1] = malloc_host<double>(BC_z_size);
     #endif
 
     #ifndef SD
     #ifdef X
     F_fv_x = malloc_host<double>(n_fp*cells_x*cv_y*cv_z*nvar);
+    dUdx = malloc_host<double>(cv_x*cv_y*cv_z*nvar);
     #endif
     #ifdef Y
     F_fv_y = malloc_host<double>(cv_x*n_fp*cells_y*cv_z*nvar);
+    dUdy = malloc_host<double>(cv_x*cv_y*cv_z*nvar);
     #endif
     #ifdef Z
     F_fv_z = malloc_host<double>(cv_x*cv_y*n_fp*cells_z*nvar);
+    dUdz = malloc_host<double>(cv_x*cv_y*cv_z*nvar);
     #endif
     possible_troubles = malloc_host<double>(cv_x*cv_y*cv_z);
     troubles = malloc_host<double>(cv_x*cv_y*cv_z);
     //FallBack Scheme
-    dUdx = malloc_host<double>(cv_x*cv_y*cv_z*nvar);
-    dUdy = malloc_host<double>(cv_x*cv_y*cv_z*nvar);
-    dUdz = malloc_host<double>(cv_x*cv_y*cv_z*nvar);
+    dUdt = malloc_host<double>(cv_x*cv_y*cv_z*nvar);
     #endif
     Write_edges();
 }

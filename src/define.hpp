@@ -12,7 +12,7 @@
 
 #define Periodic_X
 #define Periodic_Y
-//#define Periodic_Z
+#define Periodic_Z
 
 #if (defined(X) && defined(Y)) || (defined(X) && defined(Z)) || (defined(Z) && defined(Y))
 #define _2D_

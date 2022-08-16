@@ -131,6 +131,14 @@ extern double *F_x;
 extern double *F_y;
 extern double *F_z;
 
+//Buffers for the Boundary Conditions
+extern double *BC_ader_x[2];
+extern double *BC_ader_y[2];
+extern double *BC_ader_z[2];
+extern int BC_ader_x_size;
+extern int BC_ader_y_size;
+extern int BC_ader_z_size;
+
 extern double *BC_x[2];
 extern double *BC_y[2];
 extern double *BC_z[2];
@@ -150,6 +158,7 @@ extern double *troubles;
 extern double *dUdx;
 extern double *dUdy;
 extern double *dUdz;
+extern double *dUdt;
 
 extern double rho_min;
 extern double rho_max;

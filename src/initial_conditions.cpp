@@ -7,6 +7,8 @@ double gaussian_plus_square_signal(int,double,double,double);
 double sedov_blast(int,double,double,double);
 double sod_3D(int,double,double,double);
 double spherical_blast(int,double,double,double);
+double isentropic_vortex(int,double,double,double);
+double sound_wave(int,double,double,double);
 
 void Initial_Conditions(){
     double x,y,z,dx,dy,dz;
@@ -40,9 +42,11 @@ void Initial_Conditions(){
                                 //s=square_signal(var,x,y,z);
                                 //s=sine_wave(var,x,y,z);
                                 //s=kh_instability(var,x,y,z);
-                                s=sod_3D(var,x,y,z);
+                                //s=sod_3D(var,x,y,z);
                                 //s=spherical_blast(var,x,y,z);
                                 //s=sedov_blast(var,x,y,z);
+                                //s=isentropic_vortex(var,x,y,z);
+                                s=sound_wave(var,x,y,z);
                                 #ifdef X
                                 s*=w_t[l];
                                 #endif
@@ -62,7 +66,11 @@ void Initial_Conditions(){
         }
     }
     prim_to_cons(W_cv,U_cv,size_cv);
-    transform_cv_to_sp(U_cv,U_sp);    
+    transform_cv_to_sp(U_cv,U_sp); 
+    for(int var=0;var<nvar;var++){
+        for(int i=0;i<n_cv;i++)
+            memcpy(&U_ader_sp[i*size_cv+var*size_cv*n_cv], &U_sp[var*size_cv], size_cv*sizeof(double));
+    }   
 }
 
 double square_signal(int var, double x, double y, double z){
@@ -194,3 +202,86 @@ double spherical_blast(int var, double x, double y, double z){
     else
         return 0;
 }
+
+double isentropic_vortex(int var, double x, double y, double z){
+    gmma=1.4;
+    double r,r2;
+    double xc=boxlen_x/2;
+    double yc=boxlen_y/2;
+    double zc=boxlen_z/2;
+    double vphi,rho,beta = 5.;
+    #ifndef _3D_
+    r=sqrt(pow(x-xc,2) + pow(y-yc,2));
+    #else
+    r=sqrt(pow(x-xc,2) + pow(y-yc,2) + pow(z-zc,2));
+    #endif
+    r2   = pow(r,2.);
+    vphi = beta/(2.*PI)*exp(0.5*(1-r2));
+    rho  = pow(1.-(gmma-1.0)*pow(beta,2.)/(8*gmma*pow(PI,2.))*exp(1-r2),1./(gmma-1.));
+    if(var==0){
+        return rho;
+    }
+    else if(var==_p_){
+        return pow(rho,gmma);
+    }
+    else if(var==_vx_){
+        return -vphi*(y-yc)+0.;
+    }
+     else if(var==_vy_){
+        return vphi*(x-xc)+0.;
+    }
+    else
+        return 0;
+}
+
+double sound_wave(int var, double x, double y, double z){
+    gmma=1.4;
+    double rho=1,p=1,cs0=1.;
+    double kmode  = 2.*PI/boxlen_x;
+    double A = 1E-4;
+    double lambda_r = 0.0, lambda_i = 2.*PI;
+    double vel_r = lambda_i/kmode;
+    double vel_i = lambda_r/kmode;
+    double dvel = A*(sin(kmode*x));//A*(vel_r*cos(kmode*x) - vel_i*sin(kmode*x));
+
+    rho *= (1+dvel/cs0);
+    p   *= (1+gmma*dvel/cs0);
+
+    if(var==0){
+        return rho; 
+    }
+    else if(var==_p_){
+        return p;
+    }
+    else if(var==_vx_){
+        return dvel;
+    }
+     else if(var==_vy_){
+        return 0;
+    }
+    else
+        return 0;
+}
+
+//double sound_wave(int var, double x, double y, double z){
+//    double epsilon = 0.0001;
+//    double cs=1;
+//    double projx = 1./sqrt(1.+pow(boxlen_y/boxlen_x,2.0));
+//    double projy = 1./sqrt(1.+pow(boxlen_x/boxlen_y,2.0));
+//    double qx = x/boxlen_x;
+//    double qy = y/boxlen_y;
+//    double kernel = exp(-(((qx-.5)*(qx-.5)+(qy-.5)*(qy-.5))*25.));
+//    double rho = (1.+kernel*epsilon*cos(20.*PI*(qx+qy)));
+//    double vx  = cs*epsilon*cos(20.*PI*(qx+qy))*kernel*projx;
+//    double vy  = cs*epsilon*cos(20.*PI*(qx+qy))*kernel*projy;
+//    double p   = (1.+gmma*kernel*epsilon*cos(20.*PI*(qx+qy)))*cs*cs/gmma;
+//    if(var==0)
+//        return rho;
+//    else if(var==_vx_)
+//        return vx;
+//    else if(var==_vy_)
+//        return vy;
+//    else if(var==_p_)
+//        return p;
+//    else return 0;
+//}

@@ -36,15 +36,15 @@ int main(int argc, char** argv){
     #endif
     }
     //Parameters
-    n=3;
-    N = 40;
+    n=6;
+    N = 8;
     #ifdef X
     NX = N;
     #else
     NX = Nx = 1;
     #endif
     #ifdef Y
-    NY = N;
+    NY = int(N*1.);
     #else
     NY = 1;
     #endif
@@ -56,25 +56,24 @@ int main(int argc, char** argv){
     Nx=NX;
     Ny=NY;
     Nz=NZ;
-    boxlen_x = 1;
-    boxlen_y = 1.;
+    boxlen_x = 10.;
+    boxlen_y = 10.;
     boxlen_z = 1.;
-    cfl=0.8;
+    cfl=0.6;
     gmma=7./5.;
     t=0;
-    t_end=1.5;
-    double dt_output=0.1;
+    t_end=8.451542547285166;
+    double dt_output=8.451542547285166;
     double t_output=dt_output;
-    
+    double dt_min;
     Split_Domain();
     Init_variables();
     Build_mesh();
     Build_comms();
     Initial_Conditions();
  
-    #ifdef SD
-    Store_boundaries(U_sp);
-    #else
+    Store_boundaries_ader(U_ader_sp);
+    #ifndef SD
     Store_boundaries(U_cv);
     #endif
 
@@ -93,7 +92,7 @@ int main(int argc, char** argv){
                 memcpy(&U_ader_sp[i*size_cv+var*size_cv*n_cv], &U_sp[var*size_cv], size_cv*sizeof(double));
         }
         //Picard iteration
-        for(i=0;i<n_cv;i++){
+        for(i=0;i<n_cv;i++){   
             #ifdef X
             transform_sp_to_fp_x(U_ader_sp,U_ader_fp_x,n_cv);
             cons_to_prim(U_ader_fp_x,W_ader_fp_x,(n_fp*cells_x)*cv_y*cv_z*n_cv);
@@ -115,13 +114,15 @@ int main(int argc, char** argv){
             riemann_solver_z();
             derive_fp_z_to_sp(F_ader_fp_z, dU_ader_sp);
             #endif
-            Boundary_Conditions(dU_ader_sp,n_cv);  
-            if(i<n)
+            if(i<n){
                 ader_subupdate(U_ader_sp,U_sp,dU_ader_sp);
-                    
+                Boundary_Conditions_ader(U_ader_sp);
+            }
+            
         }
         #ifdef SD
         ader_update(U_sp,dU_ader_sp);
+        Boundary_Conditions(U_sp,1);
         #else
         //Change to Finite Volume scheme
         transform_sp_to_cv(U_sp,U_cv);
@@ -135,21 +136,26 @@ int main(int argc, char** argv){
             #ifdef Z
             face_integral_z(F_ader_fp_z,F_fv_z,i);
             #endif
+            //Updates both active and ghost cells of U_new
             fv_update(U_new,U_cv,i);
+            Boundary_Conditions(U_new,1);
+            //FallBack scheme and trouble detection are performed
+            //over primitive variables
+            cons_to_prim(U_cv ,W_cv ,size_cv);
+            cons_to_prim(U_new ,W_new ,size_cv);
             //Trouble Detection
             detect_troubles();
             //Godunov 2nd 
             godunov_2O();
-            //Flux correction
+            //Flux correction//
             //fv_update(U_cv,U_cv,i);
             //fv_godunov2O_update(U_cv,U_cv,i);
+            //Updates only active cells of U_cv
             fv_corrected_update(U_cv,U_cv,i);
+            //Now we update the ghost cells of U_cv
             Boundary_Conditions(U_cv,1);//Write(n_output++);
-        }//Write(n_output++);finish();
+        }//Write(n_output++);if(n_step>8)finish();
         transform_cv_to_sp(U_cv,U_sp);
-        #endif
-        #ifdef SD
-        Boundary_Conditions(U_sp,1);
         #endif
 
         compute_dt();
@@ -162,11 +168,9 @@ int main(int argc, char** argv){
         if(Master){
             cout<<".";
         }
-        if(t+dt>t_output)
+        if(t+dt>t_output){
             dt=t_output-t;
-    }
-    if(Master){
-        cout<<"trouble detection needs to be extended to include multiple variables"<<endl;
+        }
     }
 #ifdef MPI
     MPI_Finalize();

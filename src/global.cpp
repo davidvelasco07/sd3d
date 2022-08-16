@@ -126,6 +126,14 @@ double *F_x;
 double *F_y;
 double *F_z;
 
+//Buffers for the Boundary Conditions
+double *BC_ader_x[2];
+double *BC_ader_y[2];
+double *BC_ader_z[2];
+int BC_ader_x_size;
+int BC_ader_y_size;
+int BC_ader_z_size;
+
 double *BC_x[2];
 double *BC_y[2];
 double *BC_z[2];
@@ -144,6 +152,7 @@ double *troubles;
 double *dUdx;
 double *dUdy;
 double *dUdz;
+double *dUdt;
 
 double rho_min=1E-5;
 double rho_max=1E5;

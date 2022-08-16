@@ -20,7 +20,7 @@ extern void cons_to_prim(double*, double*, int);
 extern void fluxes(double*, double*, double*, int, int, int, int);
 extern double sound_speed(double, double);
 extern void riemann_llf(double*, double*, double*, int, int, int, int);
-extern void riemann_hllc(double*, double*, double*, int, int, int, int);
+extern void riemann_hllc(double*, double*, double*, int, int, int, int, bool);
 extern void riemann_solver_x();
 extern void riemann_solver_y();
 extern void riemann_solver_z();
@@ -44,6 +44,16 @@ extern void fv_update(double *, double *, int);
 
 extern void Initial_Conditions( );
 extern void Split_Domain( );
+
+extern void Boundary_Conditions_ader(double*);
+extern void Store_boundaries_ader(double*);
+extern void store_boundaries_ader_x(double*);
+extern void store_boundaries_ader_y(double*);
+extern void store_boundaries_ader_z(double*);
+extern void apply_boundaries_ader_x(double*);
+extern void apply_boundaries_ader_y(double*);
+extern void apply_boundaries_ader_z(double*);
+
 extern void Boundary_Conditions(double*, int);
 extern void Store_boundaries(double*);
 extern void store_boundaries_x(double*, int);
@@ -64,10 +74,19 @@ extern void Write_edges();
 
 //Comms
 extern void Build_comms();
-extern void Exec_comms(double*, int);
+extern void Exec_comms_x(double*, int);
+extern void Exec_comms_y(double*, int);
+extern void Exec_comms_z(double*, int);
 extern void fill_comms_x(double*, double*, int, int);
 extern void fill_comms_y(double*, double*, int, int);
 extern void fill_comms_z(double*, double*, int, int);
+
+extern void Exec_comms_ader_x(double*);
+extern void Exec_comms_ader_y(double*);
+extern void Exec_comms_ader_z(double*);
+extern void fill_comms_ader_x(double*, double*, int);
+extern void fill_comms_ader_y(double*, double*, int);
+extern void fill_comms_ader_z(double*, double*, int);
 
 extern void detect_troubles();
 extern void godunov_2O();
